@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tovkentepa MFY</title>
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* MOOD THEMES (Tungi va Kunduzgi o'zgaruvchilar) */
+    :root {
+      --card-bg: rgba(30, 41, 59, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --sidebar-bg: rgba(15, 23, 42, 0.85);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-indigo: #6366f1;
+      --accent-green: #22c55e;
+      --accent-yellow: #eab308;
+      --accent-red: #ef4444;
+      --table-header-bg: rgba(15, 23, 42, 0.8);
+      --input-bg: rgba(15, 23, 42, 0.8);
+    }
+
+    [data-theme="light"] {
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-border: rgba(186, 230, 253, 0.8);
+      --sidebar-bg: rgba(255, 255, 255, 0.9);
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --accent-blue: #0284c7;
+      --accent-indigo: #4f46e5;
+      --accent-green: #16a34a;
+      --accent-yellow: #d97706;
+      --accent-red: #dc2626;
+      --table-header-bg: rgba(224, 242, 254, 0.8);
+      --input-bg: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      color: var(--text-main);
+      /* Orqa fonga berilgan 4321.png (tungi) va 321.png (kunduzgi) rasmlari */
+      background-image: url('4321.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      padding: 1.5rem 1rem 1.5rem 80px;
+      min-height: 100vh;
+      transition: padding-left 0.3s ease, background-image 0.5s ease-in-out;
+    }
+
+    [data-theme="light"] body {
+      background-image: url('321.png');
+    }
+
+    body.sidebar-expanded { padding-left: 280px; }
+
+    .container { max-width: 1300px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+
+    /* FLOATING SIDEBAR MENU */
+    .floating-sidebar {
+      position: fixed;
+      top: 1.5rem;
+      left: 1rem;
+      bottom: 1.5rem;
+      width: 60px;
+      background: var(--sidebar-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1rem 0.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      transition: width 0.3s ease;
+      overflow: hidden;
+    }
+
+    body.sidebar-expanded .floating-sidebar { width: 250px; padding: 1rem 0.8rem; }
+
+    .sidebar-top { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 0 0.5rem; }
+
+    .sidebar-logo {
+      display: none;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--accent-blue);
+      white-space: nowrap;
+    }
+
+    body.sidebar-expanded .sidebar-logo { display: flex; }
+
+    .toggle-sidebar-btn {
+      background: rgba(56, 189, 248, 0.1);
+      border: none;
+      color: var(--accent-blue);
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      margin: 0 auto;
+    }
+
+    body.sidebar-expanded .toggle-sidebar-btn { margin: 0; }
+
+    .sidebar-menu { display: flex; flex-direction: column; gap: 0.5rem; list-style: none; }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem;
+      border-radius: 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.88rem;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-link i { font-size: 1.1rem; width: 24px; text-align: center; flex-shrink: 0; }
+
+    .sidebar-link:hover, .sidebar-link.active { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
+
+    .menu-text { opacity: 0; transition: opacity 0.2s ease; display: none; }
+
+    body.sidebar-expanded .menu-text { opacity: 1; display: inline; }
+
+    /* GLASS CARD STYLE */
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+      scroll-margin-top: 1.5rem;
+    }
+
+    .glass-card:hover { border-color: rgba(56, 189, 248, 0.3); }
+
+    /* HEADER & CONTROLS */
+    header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+
+    .header-title-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.3rem 0.8rem;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 50px;
+      color: var(--accent-blue);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    h1 { font-size: 1.8rem; font-weight: 800; color: var(--text-main); }
+    .subtitle { color: var(--text-muted); font-size: 0.9rem; }
+
+    .top-actions { display: flex; gap: 0.75rem; align-items: center; }
+
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 0.65rem 1.2rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .icon-btn:hover { background: rgba(56, 189, 248, 0.15); border-color: var(--accent-blue); }
+    .btn-admin { background: var(--accent-blue); color: white; border: none; }
+    .btn-admin:hover { opacity: 0.9; }
+
+    /* GRID LAYOUTS */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    @media (max-width: 992px) { 
+      .grid-2, .grid-3 { grid-template-columns: repeat(1, 1fr); }
+      body { padding-left: 1rem; }
+      body.sidebar-expanded { padding-left: 1rem; }
+      .floating-sidebar { display: none; }
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      color: var(--text-main);
+    }
+    .section-title i { color: var(--accent-blue); }
+
+    /* METRICS & CARDS */
+    .metric-box {
+      background: rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .metric-icon {
+      width: 45px; height: 45px; border-radius: 12px;
+      background: rgba(56, 189, 248, 0.1); color: var(--accent-blue);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+
+    .metric-info h4 { font-size: 0.8rem; color: var(--text-muted); }
+    .metric-info .val { font-size: 1.2rem; font-weight: 700; color: var(--text-main); }
+
+    /* PROGRESS TIMELINE */
+    .progress-timeline { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+    .progress-item { display: flex; flex-direction: column; gap: 0.4rem; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; }
+    .progress-bar-bg { height: 10px; background: rgba(125, 125, 125, 0.15); border-radius: 10px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 10px; transition: width 1s ease; }
+
+    /* CATEGORIES & PROJECTS */
+    .cat-card { border-left: 4px solid; padding: 1rem; background: rgba(0, 0, 0, 0.1); border-radius: 10px; margin-bottom: 0.75rem; }
+    .cat-red { border-color: var(--accent-red); }
+    .cat-yellow { border-color: var(--accent-yellow); }
+    .cat-green { border-color: var(--accent-green); }
+
+    .cat-header { display: flex; justify-content: space-between; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.3rem; }
+    .cat-body { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+
+    .project-card, .mig-item {
+      background: rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 1rem;
+    }
+    .project-icon { font-size: 1.3rem; color: var(--accent-indigo); margin-bottom: 0.5rem; }
+    .project-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .project-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+
+    /* MAHALLA YETTILIGI GRID & CARD */
+    .yettilik-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .yettilik-card {
+      background: rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .yettilik-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-blue);
+    }
+
+    .yettilik-card::after {
+      content: "Batafsil";
+      position: absolute;
+      bottom: 8px;
+      font-size: 0.7rem;
+      color: var(--accent-blue);
+      font-weight: 600;
+      opacity: 0.8;
+    }
+
+    .yettilik-img {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--accent-blue);
+      margin-bottom: 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .yettilik-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.25rem; color: var(--text-main); }
+    .yettilik-role { font-size: 0.8rem; color: var(--accent-blue); font-weight: 600; margin-bottom: 1.2rem; }
+
+    /* TABLE */
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+    th { background: var(--table-header-bg); color: var(--text-muted); padding: 0.85rem 1rem; font-weight: 600; }
+    td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--card-border); }
+    
+    .badge { padding: 0.25rem 0.6rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem; }
+    .badge-blue { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
+    .badge-green { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+
+    /* MODAL WINDOW FOR ADMIN & MEMBER DETAILS */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px);
+      display: none; justify-content: center; align-items: center; z-index: 1000;
+    }
+
+    .modal-content {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 2rem; width: 90%; max-width: 650px;
+      max-height: 85vh; overflow-y: auto; color: var(--text-main);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .close-btn { cursor: pointer; font-size: 1.3rem; color: var(--text-muted); }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .form-group input {
+      width: 100%; padding: 0.65rem; border: 1px solid var(--card-border);
+      border-radius: 8px; outline: none; background: var(--input-bg);
+      color: var(--text-main); font-size: 0.9rem;
+    }
+
+    .save-btn {
+      width: 100%; background: var(--accent-blue); color: white; border: none;
+      padding: 0.8rem; border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 1rem;
+    }
+
+    /* MEMBER DETAIL MODAL CARD */
+    .member-detail-card {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .member-detail-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--accent-blue);
+      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.3);
+    }
+
+    .member-detail-role {
+      font-size: 0.9rem;
+      color: var(--accent-blue);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .member-detail-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .member-detail-phone {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 0.7rem 1.2rem;
+      border-radius: 12px;
+      color: var(--accent-blue);
+      font-weight: 700;
+      font-size: 1.05rem;
+      text-decoration: none;
+      margin-top: 0.5rem;
+    }
+
+    .member-detail-phone:hover {
+      background: var(--accent-blue);
+      color: white;
+    }
+
+    footer { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+
+<!-- FLOATING SIDEBAR MENU -->
+<aside class="floating-sidebar" id="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <i class="fa-solid fa-archway"></i> TOVKENTEPA
+      </div>
+      <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="Menyuni yozish/yig'ish">
+        <i class="fa-solid fa-angles-right" id="toggleIcon"></i>
+      </button>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li>
+        <a href="#sec-yettilik" class="sidebar-link active">
+          <i class="fa-solid fa-users-gear"></i>
+          <span class="menu-text">Mahalla Yettiligi</span>
+        </a>
+      </li>
+      <li>
+        <a href="#sec-audit" class="sidebar-link">
+          <i class="fa-solid fa-magnifying-glass-chart"></i>
+          <span class="menu-text">Resurslar Auditi</span>
+        </a>
+      </li>
+      <li>
+        <a href="#sec-passport" class="sidebar-link">
+          <i class="fa-solid fa-id-card"></i>
+          <span class="menu-text">Hudud Pasporti</span>
+        </a>
+      </li>
+      <li>
+        <a href="#sec-poverty" class="sidebar-link">
+          <i class="fa-solid fa-chart-line-down"></i>
+          <span class="menu-text">Kambag'allik Dinamikasi</span>
+        </a>
+      </li>
+      <li>
+        <a href="#sec-projects" class="sidebar-link">
+          <i class="fa-solid fa-cubes"></i>
+          <span class="menu-text">Sayhunobod Loyihalari</span>
+        </a>
+      </li>
+      <li>
+        <a href="#sec-migration" class="sidebar-link">
+          <i class="fa-solid fa-plane-departure"></i>
+          <span class="menu-text">Migratsiya va Bandlik</span>
+        </a>
+      </li>
+      <li>
+        <a href="#sec-mechanisms" class="sidebar-link">
+          <i class="fa-solid fa-list-check"></i>
+          <span class="menu-text">Amaliy Mexanizmlar</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</aside>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="glass-card">
+    <div>
+      <div class="header-title-badge"><i class="fa-solid fa-chart-line"></i> Harakatlar Rejasi va Ijro Monitoringi</div>
+      <h1>TOVKENTEPA MFY</h1>
+      <p class="subtitle">Iqtisodiy ixtisoslashuv, Sayhunobod tajribasi va kambag'allikni tugatish</p>
+    </div>
+
+    <div class="top-actions">
+      <!-- MAVZU O'ZGARTIRISH TUGMASI (Tungi/Kunduzgi rejim va fon rasmlari) -->
+      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">
+        <i class="fa-solid fa-moon"></i> <span>Tungi rejim</span>
+      </button>
+
+      <!-- ADMIN PANEL TUGMASI -->
+      <button class="icon-btn btn-admin" onclick="openAdminModal()">
+        <i class="fa-solid fa-user-gear"></i> Admin Panel
+      </button>
+    </div>
+  </header>
+
+  <!-- MAHALLA YETTILIGI BO'LIMI -->
+  <section class="glass-card" id="sec-yettilik">
+    <div class="section-title"><i class="fa-solid fa-users-gear"></i> Mahalla Yettiligi</div>
+    <div class="yettilik-grid" id="yettilik-container">
+      <!-- Dinamik yuklanadi -->
+    </div>
+  </section>
+
+  <!-- 0-BOSQICH AUDIT -->
+  <section class="glass-card" id="sec-audit">
+    <div class="section-title"><i class="fa-solid fa-magnifying-glass-chart"></i> Xonadonbay Xatlov va Resurslar Auditi</div>
+    <div class="grid-3">
+      <div class="metric-box">
+        <div class="metric-icon"><i class="fa-solid fa-users"></i></div>
+        <div class="metric-info">
+          <h4>Inson Resurslari</h4>
+          <div class="val">Layoqatlilik Auditi</div>
+        </div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-icon"><i class="fa-solid fa-building"></i></div>
+        <div class="metric-info">
+          <h4>Boʻsh Obyektlar</h4>
+          <div class="val">5 Gektar Maydon</div>
+        </div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-icon"><i class="fa-solid fa-gears"></i></div>
+        <div class="metric-info">
+          <h4>Moyillik & Koʻnikma</h4>
+          <div class="val">Sanoat & Xizmat</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HUDUD PASPORTI -->
+  <section class="glass-card" id="sec-passport">
+    <div class="section-title"><i class="fa-solid fa-id-card"></i> 1. Hudud Pasporti & Resurslar</div>
+    <div class="grid-3">
+      <div class="mig-item">
+        <h5 style="color:var(--accent-blue); margin-bottom:0.5rem;"><i class="fa-solid fa-house-user"></i> Aholi va Bandlik</h5>
+        <p class="project-desc">• <b>Xonadonlar:</b> 661 ta<br>• <b>Oilalar:</b> 697 ta<br>• <b>Aholi:</b> 2,464 kishi</p>
+      </div>
+      <div class="mig-item">
+        <h5 style="color:var(--accent-indigo); margin-bottom:0.5rem;"><i class="fa-solid fa-warehouse"></i> Boʻsh Maydon</h5>
+        <p class="project-desc">• <b>Zahiradagi yer:</b> 5 gektar<br>• Boʻsh bino va obyektlar mavjud</p>
+      </div>
+      <div class="mig-item">
+        <h5 style="color:var(--accent-green); margin-bottom:0.5rem;"><i class="fa-solid fa-truck-fast"></i> Logistika</h5>
+        <p class="project-desc">• Yoʻl va elektr taʼminoti yetarli<br>• Sanoat va xizmatga moslashgan</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DINAMIKA VA MIKROLOYIHALAR -->
+  <div class="grid-2">
+    <!-- KAMBAG'ALLIK DARAJASI DINAMIKASI -->
+    <section class="glass-card" id="sec-poverty">
+      <div class="section-title"><i class="fa-solid fa-chart-line-down"></i> 2. Kambagʻallik Dinamikasi (697 oila)</div>
+      
+      <div class="progress-timeline">
+        <div class="progress-item">
+          <div class="progress-label">
+            <span>Yil boshi (<span id="disp-pov-start">19</span> ta oila)</span>
+            <span id="disp-pov-start-pct">2.7%</span>
+          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 100%; background: var(--accent-red);"></div></div>
+        </div>
+
+        <div class="progress-item">
+          <div class="progress-label">
+            <span>Hozirgi holat (<span id="disp-pov-curr">9</span> ta oila)</span>
+            <span id="disp-pov-curr-pct">1.3%</span>
+          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="bar-pov-curr" style="width: 47%; background: var(--accent-yellow);"></div></div>
+        </div>
+
+        <div class="progress-item">
+          <div class="progress-label">
+            <span>Yil yakuni (Target Reja)</span>
+            <span>0.0% (Toʻliq chiqarish)</span>
+          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 0%; background: var(--accent-green);"></div></div>
+        </div>
+      </div>
+
+      <div class="cat-card cat-red">
+        <div class="cat-header"><span>🔴 Qizil Toifa (4 ta oila)</span><span>Davlat taʼminoti</span></div>
+        <div class="cat-body">Moslashtirilgan uydagi yengil kasanachilik (qadoqlash, etiketka, suvenir).</div>
+      </div>
+
+      <div class="cat-card cat-yellow">
+        <div class="cat-header"><span>🟡 Sariq Toifa (3 ta oila)</span><span>Kambagʻal oilalar</span></div>
+        <div class="cat-body">Kasb-hunar vaucherlari va xizmat/sanoat mikrobiznesiga yoʻnaltirish.</div>
+      </div>
+
+      <div class="cat-card cat-green">
+        <div class="cat-header"><span>🟢 Yashil Toifa (2 ta oila)</span><span>Chegaradagi oilalar</span></div>
+        <div class="cat-body">Sanoat va xizmat kooperatsiyasiga biriktirish orqali doimiy ishga joylash.</div>
+      </div>
+    </section>
+
+    <!-- SAYHUNOBOD MIKROLOYIHALAR -->
+    <section class="glass-card" id="sec-projects" style="display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div class="section-title"><i class="fa-solid fa-cubes"></i> 3. Sayhunobod Tajribasi: 4 Mikroloyiha</div>
+        <div class="grid-2" style="gap:1rem;">
+          <div class="project-card">
+            <div class="project-icon"><i class="fa-solid fa-store"></i></div>
+            <div class="project-title">1. Maishiy Xizmat</div>
+            <div class="project-desc">Xonadonlarda maishiy xizmat va oʻquv markazlari.</div>
+          </div>
+          <div class="project-card">
+            <div class="project-icon"><i class="fa-solid fa-industry"></i></div>
+            <div class="project-title">2. Kichik Sanoat</div>
+            <div class="project-desc">5 ha maydonda qadoqlash va mini-sexlar.</div>
+          </div>
+          <div class="project-card">
+            <div class="project-icon"><i class="fa-solid fa-shirt"></i></div>
+            <div class="project-title">3. Kasanachilik</div>
+            <div class="project-desc">Tikuv va qadoqlash dastgohlari, xaridor kafolati.</div>
+          </div>
+          <div class="project-card">
+            <div class="project-icon"><i class="fa-solid fa-hammer"></i></div>
+            <div class="project-title">4. Mebelsozlik</div>
+            <div class="project-desc">Yogʻochga ishlov berish va mebel mini-dastgohlari.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--card-border); text-align:center;">
+        <div style="font-size:0.85rem; font-weight:700; color:var(--accent-blue);">4. Kooperatsiya Modeli:</div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">[Kooperator] ➔ Xomashyo/Dastgoh ➔ [Xonadon] ➔ Kafolatlangan Xarid</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MIGRATSIYA BO'LIMI -->
+  <section class="glass-card" id="sec-migration">
+    <div class="section-title"><i class="fa-solid fa-plane-departure"></i> 5. Migratsiyadagi Vatandoshlar Bilan Ishlash va Bandlikka Ko‘maklashish</div>
+    <div class="grid-3">
+      <div class="mig-item">
+        <h5 style="color:var(--accent-blue); margin-bottom:0.4rem;"><i class="fa-solid fa-headset"></i> Muntazam Muloqot</h5>
+        <p class="project-desc"><b id="disp-mig-count">10</b> nafar vaqtincha xorijda bo'lgan fuqarolar bilan doimiy onlayn muloqot va ularning oilasidan xabar olish.</p>
+      </div>
+      <div class="mig-item">
+        <h5 style="color:var(--accent-green); margin-bottom:0.4rem;"><i class="fa-solid fa-house-laptop"></i> Vatanga Qaytuvchilar</h5>
+        <p class="project-desc">Mahalladagi 4 ta mikroloyiha, yaratilayotgan ish oʻrinlari hamda imtiyozli biznes kreditlari taklif etiladi.</p>
+      </div>
+      <div class="mig-item">
+        <h5 style="color:var(--accent-indigo); margin-bottom:0.4rem;"><i class="fa-solid fa-passport"></i> Xorijga Ketuvchilar</h5>
+        <p class="project-desc">Agentlik orqali xavfsiz, qonuniy va tartibli ishga joylashish, kasb va til oʻrgatish boʻyicha amaliy yordam.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. AMALIY MEXANIZMLAR -->
+  <section class="glass-card" id="sec-mechanisms">
+    <div class="section-title"><i class="fa-solid fa-list-check"></i> 6. AMALIY MEXANIZMLAR</div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>T/r</th>
+            <th>Yoʻnalish</th>
+            <th>Yil Boshi</th>
+            <th>Hozirgi Holat</th>
+            <th>Yil Yakuni Target</th>
+            <th>Amaliy Mexanizm / Yechim</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><b>Doimiy ish oʻrni</b></td>
+            <td id="td-job-start">0 ta</td>
+            <td id="td-job-curr">35 ta</td>
+            <td><span class="badge badge-blue" id="td-job-plan">70 ta</span></td>
+            <td>`my.mehnat.uz` orqali rasmiy mehnat shartnomalari tuzish.</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><b>Soyadan chiqarish (Legallashtirish)</b></td>
+            <td id="td-legal-start">20 ta</td>
+            <td id="td-legal-curr">65 ta</td>
+            <td><span class="badge badge-blue" id="td-legal-plan">110 ta</span></td>
+            <td>`Soliq.uz` orqali Oʻzini oʻzi band qilish maqomini berish.</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><b>Aholi daromadini oshirish</b></td>
+            <td id="td-inc-start">0 ta</td>
+            <td id="td-inc-curr">80 ta</td>
+            <td><span class="badge badge-blue" id="td-inc-plan">155 ta</span></td>
+            <td>Mikroloyiha va xizmatlar orqali oilaviy daromadni oshirish.</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><b>Migratsiyadagilar bilan ishlash</b></td>
+            <td id="td-mig-start">10 nafar</td>
+            <td id="td-mig-curr">10 nafar</td>
+            <td><span class="badge badge-blue" id="td-mig-plan">10 nafar</span></td>
+            <td>Muntazam muloqot, vatanga qaytarish yoki qonuniy ketishga koʻmaklashish.</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><b>Kambagʻallikni tugatish</b></td>
+            <td id="td-pov-start-tbl">19 ta</td>
+            <td id="td-pov-curr-tbl">9 ta</td>
+            <td><span class="badge badge-green">0 ta (0.0%)</span></td>
+            <td>Vaucher, kasanachilik va mikrobiznes orqali toifalardan chiqarish.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    Tovkentepa MFY Boshqaruv Paneli • <span>Sayhunobod Tajribasi</span>
+  </footer>
+
+</div>
+
+<!-- MAHALLA YETTILIGI BATAFSIL MODAL -->
+<div class="modal-overlay" id="memberDetailModal">
+  <div class="modal-content" style="max-width: 450px;">
+    <div class="modal-header">
+      <h3><i class="fa-solid fa-address-card"></i> Xodim Ma'lumotlari</h3>
+      <span class="close-btn" onclick="closeMemberModal()">&times;</span>
+    </div>
+    <div class="member-detail-card">
+      <img src="" alt="" class="member-detail-img" id="det-img">
+      <div class="member-detail-role" id="det-role"></div>
+      <div class="member-detail-name" id="det-name"></div>
+      <a href="#" class="member-detail-phone" id="det-phone-link">
+        <i class="fa-solid fa-phone-flip"></i> <span id="det-phone"></span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN MODAL WINDOW -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal-content">
+    
+    <!-- LOGIN FORM -->
+    <div id="loginSection">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-lock"></i> Admin Tizimiga Kirish</h3>
+        <span class="close-btn" onclick="closeAdminModal()">&times;</span>
+      </div>
+      <div class="form-group">
+        <label>Login</label>
+        <input type="text" id="adminLogin" placeholder="admin">
+      </div>
+      <div class="form-group">
+        <label>Parol</label>
+        <input type="password" id="adminPass" placeholder="123">
+      </div>
+      <button class="save-btn" onclick="checkAuth()">Kirish</button>
+    </div>
+
+    <!-- PANEL EDIT FORM -->
+    <div id="editSection" style="display:none;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-pen-to-square"></i> Ma'lumotlarni Tahrirlash</h3>
+        <span class="close-btn" onclick="closeAdminModal()">&times;</span>
+      </div>
+
+      <h4 style="margin: 0.8rem 0; color:var(--accent-blue);"><i class="fa-solid fa-users-gear"></i> Mahalla Yettiligi A'zolari:</h4>
+      <div id="admin-yettilik-inputs">
+        <!-- Dinamik inputlar -->
+      </div>
+
+      <h4 style="margin: 0.8rem 0; color:var(--accent-blue);">1. Kambag'al Oilalar Soni:</h4>
+      <div class="form-group"><label>Yil Boshi (ta)</label><input type="number" id="inp-pov-start"></div>
+      <div class="form-group"><label>Hozirgi Holat (ta)</label><input type="number" id="inp-pov-curr"></div>
+
+      <h4 style="margin: 0.8rem 0; color:var(--accent-blue);">2. Doimiy Ish O'rinlari:</h4>
+      <div class="form-group"><label>Yil Boshi</label><input type="number" id="inp-job-start"></div>
+      <div class="form-group"><label>Hozirgi Holat</label><input type="number" id="inp-job-curr"></div>
+      <div class="form-group"><label>Yil Yakuni Target</label><input type="number" id="inp-job-plan"></div>
+
+      <h4 style="margin: 0.8rem 0; color:var(--accent-blue);">3. Legallashtirish (Soyadan chiqarish):</h4>
+      <div class="form-group"><label>Yil Boshi</label><input type="number" id="inp-legal-start"></div>
+      <div class="form-group"><label>Hozirgi Holat</label><input type="number" id="inp-legal-curr"></div>
+      <div class="form-group"><label>Yil Yakuni Target</label><input type="number" id="inp-legal-plan"></div>
+
+      <h4 style="margin: 0.8rem 0; color:var(--accent-blue);">4. Migratsiyadagi Vatandoshlar:</h4>
+      <div class="form-group"><label>Soni (nafar)</label><input type="number" id="inp-mig-count"></div>
+
+      <button class="save-btn" onclick="saveData()">Saqlash va Yangilash</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // SIDEBAR TOGGLE & SCROLL ACTIVE LOGIC
+  function toggleSidebar() {
+    document.body.classList.toggle('sidebar-expanded');
+    const icon = document.getElementById('toggleIcon');
+    if (document.body.classList.contains('sidebar-expanded')) {
+      icon.className = 'fa-solid fa-angles-left';
+    } else {
+      icon.className = 'fa-solid fa-angles-right';
+    }
+  }
+
+  // ACTIVE MENU LINK ON SCROLL
+  const sections = document.querySelectorAll('section');
+  const navLinks = document.querySelectorAll('.sidebar-link');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      if (pageYOffset >= (sectionTop - 150)) {
+        current = section.getAttribute('id');
+      }
+    });
+
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href').includes(current)) {
+        link.classList.add('active');
+      }
+    });
+  });
+
+  // DEFAULT YETTILIK ROLES (WITH MAHALLA BANKIRI)
+  const defaultYettilikData = [
+    { role: "Mahalla raisi", name: "", img: "", phone: "" },
+    { role: "Hokim yordamchisi", name: "", img: "", phone: "" },
+    { role: "Xotin-qizlar faoli", name: "", img: "", phone: "" },
+    { role: "Yoshlar yetakchisi", name: "", img: "", phone: "" },
+    { role: "Profilaktika inspektori", name: "", img: "", phone: "" },
+    { role: "Ijtimoiy xodim", name: "", img: "", phone: "" },
+    { role: "Mahalla bankiri", name: "", img: "", phone: "" }
+  ];
+
+  // DEFAULT DATA & RENDER
+  let defaultData = {
+    yettilik: defaultYettilikData,
+    povStart: 19, povCurr: 9,
+    jobStart: 0, jobCurr: 35, jobPlan: 70,
+    legalStart: 20, legalCurr: 65, legalPlan: 110,
+    incStart: 0, incCurr: 80, incPlan: 155,
+    migCount: 10
+  };
+
+  let store = JSON.parse(localStorage.getItem('tovkentepa_dark_data')) || defaultData;
+  if(!store.yettilik || store.yettilik.length < 7) store.yettilik = defaultYettilikData;
+
+  function renderYettilik() {
+    const container = document.getElementById('yettilik-container');
+    container.innerHTML = store.yettilik.map((item, index) => `
+      <div class="yettilik-card" onclick="openMemberModal(${index})">
+        <img src="${item.img || 'https://via.placeholder.com/150'}" alt="${item.name}" class="yettilik-img" onerror="this.src='https://via.placeholder.com/150'">
+        <div class="yettilik-name">${item.name || 'F.I.SH kiritilmagan'}</div>
+        <div class="yettilik-role">${item.role}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderData() {
+    renderYettilik();
+
+    // Poverty
+    document.getElementById('disp-pov-start').innerText = store.povStart;
+    document.getElementById('disp-pov-curr').innerText = store.povCurr;
+    document.getElementById('disp-pov-start-pct').innerText = ((store.povStart / 697) * 100).toFixed(1) + '%';
+    document.getElementById('disp-pov-curr-pct').innerText = ((store.povCurr / 697) * 100).toFixed(1) + '%';
+    document.getElementById('bar-pov-curr').style.width = Math.min(100, (store.povCurr / store.povStart) * 100) + '%';
+
+    document.getElementById('td-pov-start-tbl').innerText = store.povStart + ' ta';
+    document.getElementById('td-pov-curr-tbl').innerText = store.povCurr + ' ta';
+
+    // Jobs
+    document.getElementById('td-job-start').innerText = store.jobStart + ' ta';
+    document.getElementById('td-job-curr').innerText = store.jobCurr + ' ta';
+    document.getElementById('td-job-plan').innerText = store.jobPlan + ' ta';
+
+    // Legal
+    document.getElementById('td-legal-start').innerText = store.legalStart + ' ta';
+    document.getElementById('td-legal-curr').innerText = store.legalCurr + ' ta';
+    document.getElementById('td-legal-plan').innerText = store.legalPlan + ' ta';
+
+    // Migration
+    document.getElementById('disp-mig-count').innerText = store.migCount;
+    document.getElementById('td-mig-start').innerText = store.migCount + ' nafar';
+    document.getElementById('td-mig-curr').innerText = store.migCount + ' nafar';
+    document.getElementById('td-mig-plan').innerText = store.migCount + ' nafar';
+  }
+
+  // MEMBER DETAIL MODAL LOGIC
+  function openMemberModal(index) {
+    const member = store.yettilik[index];
+    if(!member) return;
+
+    document.getElementById('det-img').src = member.img || 'https://via.placeholder.com/150';
+    document.getElementById('det-role').innerText = member.role;
+    document.getElementById('det-name').innerText = member.name || 'F.I.SH kiritilmagan';
+    
+    const phoneVal = member.phone || 'Kiritilmagan';
+    document.getElementById('det-phone').innerText = phoneVal;
+    
+    const phoneLink = document.getElementById('det-phone-link');
+    if(member.phone) {
+      phoneLink.href = 'tel:' + member.phone.replace(/\s+/g, '');
+      phoneLink.style.pointerEvents = 'auto';
+    } else {
+      phoneLink.href = '#';
+      phoneLink.style.pointerEvents = 'none';
+    }
+
+    document.getElementById('memberDetailModal').style.display = 'flex';
+  }
+
+  function closeMemberModal() {
+    document.getElementById('memberDetailModal').style.display = 'none';
+  }
+
+  // ADMIN MODAL LOGIC
+  function openAdminModal() { document.getElementById('adminModal').style.display = 'flex'; }
+  function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
+
+  function checkAuth() {
+    const l = document.getElementById('adminLogin').value;
+    const p = document.getElementById('adminPass').value;
+    if(l === 'admin' && p === '123') {
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('editSection').style.display = 'block';
+      loadInputs();
+    } else {
+      alert('Login yoki parol noto\'g\'ri!');
+    }
+  }
+
+  function loadInputs() {
+    // Load Yettilik inputs
+    const yettilikAdminContainer = document.getElementById('admin-yettilik-inputs');
+    yettilikAdminContainer.innerHTML = store.yettilik.map((item, index) => `
+      <div style="background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 10px; margin-bottom: 0.8rem; border: 1px solid var(--card-border);">
+        <strong style="color: var(--accent-blue); font-size: 0.85rem;">${index + 1}. ${item.role}</strong>
+        <div class="form-group" style="margin-top: 0.4rem; margin-bottom: 0.4rem;">
+          <label style="font-size: 0.75rem;">F.I.SH</label>
+          <input type="text" id="inp-yettilik-name-${index}" value="${item.name || ''}" placeholder="F.I.SH ni kiriting">
+        </div>
+        <div class="form-group" style="margin-bottom: 0.4rem;">
+          <label style="font-size: 0.75rem;">Telefon raqami</label>
+          <input type="text" id="inp-yettilik-phone-${index}" value="${item.phone || ''}" placeholder="+998901234567">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label style="font-size: 0.75rem;">Rasm URL manzili</label>
+          <input type="text" id="inp-yettilik-img-${index}" value="${item.img || ''}" placeholder="https://...">
+        </div>
+      </div>
+    `).join('');
+
+    // Load Metrics
+    document.getElementById('inp-pov-start').value = store.povStart;
+    document.getElementById('inp-pov-curr').value = store.povCurr;
+    
+    document.getElementById('inp-job-start').value = store.jobStart;
+    document.getElementById('inp-job-curr').value = store.jobCurr;
+    document.getElementById('inp-job-plan').value = store.jobPlan;
+
+    document.getElementById('inp-legal-start').value = store.legalStart;
+    document.getElementById('inp-legal-curr').value = store.legalCurr;
+    document.getElementById('inp-legal-plan').value = store.legalPlan;
+
+    document.getElementById('inp-mig-count').value = store.migCount;
+  }
+
+  function saveData() {
+    // Save Yettilik
+    store.yettilik = store.yettilik.map((item, index) => ({
+      ...item,
+      name: document.getElementById(`inp-yettilik-name-${index}`).value,
+      phone: document.getElementById(`inp-yettilik-phone-${index}`).value,
+      img: document.getElementById(`inp-yettilik-img-${index}`).value
+    }));
+
+    // Save Metrics
+    store.povStart = Number(document.getElementById('inp-pov-start').value);
+    store.povCurr = Number(document.getElementById('inp-pov-curr').value);
+    
+    store.jobStart = Number(document.getElementById('inp-job-start').value);
+    store.jobCurr = Number(document.getElementById('inp-job-curr').value);
+    store.jobPlan = Number(document.getElementById('inp-job-plan').value);
+
+    store.legalStart = Number(document.getElementById('inp-legal-start').value);
+    store.legalCurr = Number(document.getElementById('inp-legal-curr').value);
+    store.legalPlan = Number(document.getElementById('inp-legal-plan').value);
+
+    store.migCount = Number(document.getElementById('inp-mig-count').value);
+
+    localStorage.setItem('tovkentepa_dark_data', JSON.stringify(store));
+    renderData();
+    closeAdminModal();
+    alert('Ma\'lumotlar muvaffaqiyatli saqlandi va yangilandi!');
+  }
+
+  // THEME TOGGLE LOGIC (Tungi va Kunduzgi rasmlarni almashtirish)
+  let currentTheme = localStorage.getItem('theme') || 'dark';
+  if(currentTheme === 'light') applyTheme('light');
+
+  function toggleTheme() {
+    currentTheme = (currentTheme === 'dark') ? 'light' : 'dark';
+    applyTheme(currentTheme);
+  }
+
+  function applyTheme(theme) {
+    if(theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.getElementById('themeBtn').innerHTML = '<i class="fa-solid fa-sun"></i> <span>Kunduzgi rejim</span>';
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      document.getElementById('themeBtn').innerHTML = '<i class="fa-solid fa-moon"></i> <span>Tungi rejim</span>';
+    }
+    localStorage.setItem('theme', theme);
+  }
+
+  // INITIALIZE
+  renderData();
+</script>
+
+</body>
+</html>
